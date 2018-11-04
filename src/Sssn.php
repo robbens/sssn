@@ -105,7 +105,7 @@ class Sssn
             $controlNumber = 0;
         }
 
-        $this->ssn = $ssnPartial . $controlNumber;
+        $this->ssn = substr_replace($ssnPartial . $controlNumber, '-', 5,1);
 
         return $this;
     }
