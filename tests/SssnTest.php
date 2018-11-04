@@ -22,7 +22,7 @@ class SssnTest extends TestCase
 
     public function testMake()
     {
-        $validSsn = '6205251231';
+        $validSsn = '620525-1231';
 
         $generatedSsn = Sssn::make('620525', '123');
 

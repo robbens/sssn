@@ -27,7 +27,7 @@ class Sssn
      */
     public function female()
     {
-        $this->gender = $this->generateGender('female');
+        $this->gender = $this->generateGender(static::GENDER_FEMALE);
 
         return $this;
     }
@@ -38,7 +38,7 @@ class Sssn
      */
     public function male()
     {
-        $this->gender = $this->generateGender('male');
+        $this->gender = $this->generateGender(static::GENDER_MALE);
 
         return $this;
     }
@@ -66,46 +66,16 @@ class Sssn
         // Combine date, key and gender key.
         $ssnPartial = $this->date . $this->key . $this->gender;
 
-        // Remove the leading two numbers if the total if above 9.
+        // Remove the leading two numbers if the length is above 9.
         if (strlen($ssnPartial) > 9) {
             $ssnPartial = substr($ssnPartial, 2);
         }
 
-        /**
-         * Calculate the final control number. i.e 998877-112X
-         *
-         * Split all numbers in to an array and multiply every other with 2.
-         * Sum all numbers in the array. Numbers above 9 will be split in to two and summed individually.
-         *
-         * Example: 620525-123
-         * 6    2   0   5   2   5 - 1   2   3
-         * 12 + 2 + 0 + 5 + 4 + 5 + 2 + 2 + 6 = 38
-         */
+        // Calculate the last control number by using luhn algorithm.
+        $checksum = $this->luhn($ssnPartial);
 
-        $combined = Collection::make(str_split($ssnPartial))
-            ->map(function ($number, $index) {
-                return $index % 2 ? $number : $number * 2;
-            })->sum(function ($number) {
-                if ($number >= 10) {
-                    return str_split($number)[0] + str_split($number)[1];
-                }
-
-                return $number;
-            });
-
-        /**
-         * Get the last number from 38 (8) and remove it from the number 10.
-         * So we do 10 - 8 = 2. That's our final control number. Yay!
-         *
-         * However! If the control number is 10. We return 0.
-         */
-        $controlNumber = (10 - substr($combined, 1, 1));
-
-        if ($controlNumber >= 10) {
-            $controlNumber = 0;
-        }
-
-        $this->ssn = substr_replace($ssnPartial . $controlNumber, '-', 5,1);
+        // Insert a hyphen.
+        $this->ssn = substr_replace($ssnPartial . $checksum, '-', 6, 0);
 
         return $this;
     }
@@ -118,7 +88,7 @@ class Sssn
      * @return int
      * @throws \Exception
      */
-    private function generateGender(string $gender = null): int
+    private function generateGender($gender = null): int
     {
         $number = mt_rand(0, 9);
 
@@ -126,15 +96,50 @@ class Sssn
             return (int)$number;
         }
 
-        if ($gender === 'male') {
+        if ($gender === static::GENDER_MALE) {
             return (int)$number | 1;
         }
 
-        if ($gender === 'female') {
+        if ($gender === static::GENDER_FEMALE) {
             return (int)$number & ~1;
         }
 
         throw new \InvalidArgumentException('Invalid gender. Use male or female.');
+    }
+    
+    /**
+     * Luhns algorithm.
+     *
+     * @param $ssnPartial
+     * @return int|string
+     *
+     * @url https://en.wikipedia.org/wiki/Luhn_algorithm
+     */
+    protected function luhn(string $ssnPartial)
+    {
+        /**
+         * Calculate the final control number. i.e 998877-112X
+         *
+         * Split all numbers in to an array and multiply every other
+         * with 2. Sum all numbers in the array and stringify.
+         *
+         * Example: 620525-123
+         * 6    2   0   5   2   5 - 1   2   3
+         * 12 + 2 + 0 + 5 + 4 + 5 + 2 + 2 + 6 = 38
+         */
+        $checksum = Collection::make(str_split($ssnPartial))
+            ->map(function ($number, $index) {
+                return $index % 2 ? $number : $number * 2;
+            })->implode('');
+
+        /**
+         * Get the last number from 38 (8) and remove it from the number 10.
+         * So we do 10 - 8 = 2. That's our final control number. Yay!
+         *
+         * However! If the control number is 10. We return 0.
+         */
+        $checksum = 10 - (array_sum(str_split($checksum)) % 10) % 10;
+        return $checksum;
     }
 
     /**
