@@ -8,7 +8,7 @@ composer require robbens\sssn
 ## Usage
 Generate a random date and identifier.
 ```php
-$validSsn = Sssn::make(); // 3512206537
+$validSsn = Sssn::make(); // 351220-6537
 ```
 Specify a date and identifier manually.
 ```php
