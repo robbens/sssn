@@ -1,7 +1,7 @@
 This package will generate a valid Swedish social security number.
 It looks something like this: **790631-2629**
 ## Installation
-```php
+```
 composer require robbens\sssn
 ```
 
