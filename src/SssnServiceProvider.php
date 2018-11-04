@@ -1,6 +1,6 @@
 <?php
 
-namespace Robbens;
+namespace Robbens\Sssn;
 
 use Illuminate\Support\ServiceProvider;
 
