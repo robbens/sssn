@@ -1,0 +1,26 @@
+{
+    "name": "robbens/sssn",
+    "description": "Generates a valid Swedish social security number.",
+    "minimum-stability": "stable",
+    "keywords": ["laravel", "ssn", "swedish", "social security number"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Robin Nilsson",
+            "email": "hej@robin.se"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Robbens\\Sssn\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel":  {
+            "providers": ["Robbens\\Sssn\\SssnServiceProvider"]
+        }
+    }
+}
