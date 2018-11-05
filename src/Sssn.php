@@ -138,7 +138,8 @@ class Sssn
          *
          * However! If the control number is 10. We return 0.
          */
-        $checksum = 10 - (array_sum(str_split($checksum)) % 10) % 10;
+        $checksum = (10 - (array_sum(str_split($checksum)) % 10)) % 10;
+
         return $checksum;
     }
 
