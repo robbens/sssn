@@ -150,11 +150,9 @@ class Sssn
      */
     private static function makeDate()
     {
-        $year = self::pad(mt_rand(0, 99));
-        $month = self::pad(mt_rand(1, 12));
-        $day = self::pad(mt_rand(1, 31));
+        $timestamp = mt_rand(-102389472, 1541462400);
 
-        return $year . $month . $day;
+        return date("ymd", $timestamp);
     }
 
     /**
