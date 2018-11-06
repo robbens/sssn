@@ -31,10 +31,20 @@ class SssnTest extends TestCase
 
     public function testChecksumEqualsTen()
     {
-        $validSsn = '5607082160';
+        $validSsn = '560708-2160';
 
         $generatedSsn = Sssn::make('560708', '216');
 
         $this->assertEquals($validSsn, $generatedSsn->get());
     }
+
+    public function testValidate()
+    {
+        $generatedSsn = Sssn::make('560708', '216');
+
+        $valid = Sssn::validate($generatedSsn);
+
+        $this->assertTrue($valid);
+    }
+
 }
