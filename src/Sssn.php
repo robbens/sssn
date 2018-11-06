@@ -22,12 +22,32 @@ class Sssn
     }
 
     /**
+     * Validate an SSN.
+     *
+     * @param string $ssn
+     * @return bool
+     */
+    public static function validate(string $ssn)
+    {
+        $ssn = self::cleanSsn($ssn);
+        $ssnPartial = substr_replace($ssn, '', 9);
+
+        $checksum = self::luhn($ssnPartial);
+
+        if ($ssnPartial . $checksum !== $ssn) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @return $this
      * @throws \Exception
      */
     public function female()
     {
-        $this->gender = $this->generateGender(static::GENDER_FEMALE);
+        $this->gender = $this->generateGender(self::GENDER_FEMALE);
 
         return $this;
     }
@@ -38,7 +58,7 @@ class Sssn
      */
     public function male()
     {
-        $this->gender = $this->generateGender(static::GENDER_MALE);
+        $this->gender = $this->generateGender(self::GENDER_MALE);
 
         return $this;
     }
@@ -71,8 +91,8 @@ class Sssn
             $ssnPartial = substr($ssnPartial, 2);
         }
 
-        // Calculate the last control number by using luhn algorithm.
-        $checksum = $this->luhn($ssnPartial);
+        // Calculate the last control number by using Luhn algorithm.
+        $checksum = self::luhn($ssnPartial);
 
         // Insert a hyphen.
         $this->ssn = substr_replace($ssnPartial . $checksum, '-', 6, 0);
@@ -106,16 +126,16 @@ class Sssn
 
         throw new \InvalidArgumentException('Invalid gender. Use male or female.');
     }
-    
+
     /**
-     * Luhns algorithm.
+     * Luhn's algorithm.
      *
      * @param $ssnPartial
      * @return int|string
      *
      * @url https://en.wikipedia.org/wiki/Luhn_algorithm
      */
-    protected function luhn(string $ssnPartial)
+    protected static function luhn(string $ssnPartial)
     {
         /**
          * Calculate the final control number. i.e 998877-112X
@@ -155,15 +175,9 @@ class Sssn
         return date("ymd", $timestamp);
     }
 
-    /**
-     * Add a leading zero.
-     *
-     * @param $number
-     * @return string
-     */
-    private static function pad($number)
+    protected static function cleanSsn(string $ssn)
     {
-        return str_pad($number, 2, '0', STR_PAD_LEFT);
+        return preg_replace('/[^0-9]/', '', $ssn);
     }
 
     /**
