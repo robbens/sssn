@@ -6,10 +6,10 @@ use Illuminate\Support\Collection;
 
 class Sssn
 {
-    public $date;
-    public $key;
-    public $gender;
-    public $ssn;
+    public $date = '';
+    public $key = '';
+    public $gender = null;
+    public $ssn = '';
 
     /**
      * @param string $date
@@ -18,7 +18,17 @@ class Sssn
      */
     public static function make(string $date = null, string $key = null)
     {
-        return (new static)->create($date, $key);
+        return (new static)->init($date, $key);
+    }
+
+    protected function init($date, $key)
+    {
+        $this->date = $date ?? self::makeDate();
+        $this->key = $this->generateKey($key);
+        $this->gender = $this->generateGender();
+        $this->create();
+
+        return $this;
     }
 
     /**
@@ -53,23 +63,25 @@ class Sssn
     }
 
     /**
+     * @param null $number
      * @return $this
-     * @throws \Exception
      */
-    public function female()
+    public function female($number = null)
     {
-        $this->gender = $this->generateGender('female');
+        $this->gender = $number ?? $this->generateGender('female');
+        $this->create();
 
         return $this;
     }
 
     /**
+     * @param null $number
      * @return $this
-     * @throws \Exception
      */
-    public function male()
+    public function male($number = null)
     {
-        $this->gender = $this->generateGender('male');
+        $this->gender = $number ?? $this->generateGender('male');
+        $this->create();
 
         return $this;
     }
@@ -83,17 +95,10 @@ class Sssn
     }
 
     /**
-     * @param string $date
-     * @param string|null $key
      * @return $this
-     * @throws \Exception
      */
-    protected function create(string $date = null, string $key = null)
+    protected function create()
     {
-        $this->date = $date ?? self::makeDate();
-        $this->key = $key ?? mt_rand(10, 99);
-        $this->gender = strlen($this->key) === 2 ? $this->generateGender() : null;
-
         // Combine date, key and gender key.
         $ssnPartial = $this->date . $this->key . $this->gender;
 
@@ -106,9 +111,11 @@ class Sssn
         $checksum = self::luhn($ssnPartial);
 
         // Insert a hyphen.
-        $this->ssn = substr_replace($ssnPartial . $checksum, '-', 6, 0);
+        $ssn = substr_replace($ssnPartial . $checksum, '-', 6, 0);
 
-        return $this;
+        $this->ssn = $ssn;
+
+        return $ssn;
     }
 
     /**
@@ -187,10 +194,31 @@ class Sssn
     }
 
     /**
+     * @param $key
+     * @return string
+     */
+    protected function generateKey($key = null): string
+    {
+        if (isset($key) && strlen($key) != 2) {
+            throw new \LengthException('Key has to be null or have the exact length of 2.');
+        }
+
+        if (strlen($key) == 2) {
+            return $key;
+        }
+
+        return self::pad(mt_rand(1, 99));
+    }
+
+    protected static function pad($str) {
+        return str_pad($str, 2, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * @return string
      */
     public function __toString()
     {
-        return $this->ssn;
+        return $this->create();
     }
 }

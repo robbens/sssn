@@ -23,5 +23,14 @@ $validMaleSsn = Sssn::make('890525')->male(); // 890525-4473
 $validFemaleSsn = Sssn::make('890525')->female(); // 8905257948
 ```
 
+Validate.
+```php
+Sssn::validate('8011036301'); // true
+
+Sssn::validate('80/11/03-6301'); // true
+
+Sssn::validate('801103-6302'); // false
+```
+
 ## How the ssn is generated
 TODO

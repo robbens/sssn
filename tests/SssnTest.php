@@ -24,7 +24,7 @@ class SssnTest extends TestCase
     {
         $validSsn = '620525-1231';
 
-        $generatedSsn = Sssn::make('620525', '123');
+        $generatedSsn = Sssn::make('620525', '12')->male(3);
 
         $this->assertEquals($validSsn, $generatedSsn->get());
     }
@@ -33,14 +33,14 @@ class SssnTest extends TestCase
     {
         $validSsn = '560708-2160';
 
-        $generatedSsn = Sssn::make('560708', '216');
+        $generatedSsn = Sssn::make('560708', '21')->female(6);
 
         $this->assertEquals($validSsn, $generatedSsn->get());
     }
 
     public function testValidate()
     {
-        $generatedSsn = Sssn::make('560708', '216');
+        $generatedSsn = Sssn::make('560708', '21')->female(6);
 
         $valid = Sssn::validate($generatedSsn);
 
