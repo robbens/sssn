@@ -29,7 +29,7 @@ class Sssn
      */
     public static function validate(string $ssn)
     {
-        $ssn = self::cleanSsn($ssn);
+        $ssn = self::clean($ssn);
         $ssnPartial = substr_replace($ssn, '', 9);
 
         $checksum = self::luhn($ssnPartial);
@@ -39,6 +39,17 @@ class Sssn
         }
 
         return true;
+    }
+
+    /**
+     * Strips all characters but numbers.
+     *
+     * @param string $ssn
+     * @return string|string[]|null
+     */
+    public static function clean(string $ssn)
+    {
+        return preg_replace('/[^0-9]/', '', $ssn);
     }
 
     /**
@@ -173,11 +184,6 @@ class Sssn
         $timestamp = mt_rand(-102389472, 1541462400);
 
         return date("ymd", $timestamp);
-    }
-
-    protected static function cleanSsn(string $ssn)
-    {
-        return preg_replace('/[^0-9]/', '', $ssn);
     }
 
     /**
