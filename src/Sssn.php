@@ -58,7 +58,7 @@ class Sssn
      */
     public function female()
     {
-        $this->gender = $this->generateGender(self::GENDER_FEMALE);
+        $this->gender = $this->generateGender('female');
 
         return $this;
     }
@@ -69,7 +69,7 @@ class Sssn
      */
     public function male()
     {
-        $this->gender = $this->generateGender(self::GENDER_MALE);
+        $this->gender = $this->generateGender('male');
 
         return $this;
     }
@@ -127,11 +127,11 @@ class Sssn
             return (int)$number;
         }
 
-        if ($gender === static::GENDER_MALE) {
+        if ($gender === 'male') {
             return (int)$number | 1;
         }
 
-        if ($gender === static::GENDER_FEMALE) {
+        if ($gender === 'female') {
             return (int)$number & ~1;
         }
 
